@@ -6,8 +6,7 @@ public class String : MonoBehaviour {
 	public float dampRate;
 	public float waveVelocity;
 	public float maxAmplitude;
-	public Vector3 startPosition;
-	public Vector3 endPosition;
+	public float length;
 	public int[] pointsPerFret;
 	float time = 0;
 	LineRenderer lineRenderer;
@@ -24,11 +23,10 @@ public class String : MonoBehaviour {
 	void Start () {
 		lineRenderer = GetComponent<LineRenderer>();
 		InitializeLine();
+		ResizeBox();
 	}
 	private void InitializeLine(){
-
-		float totalLength = (endPosition - startPosition).magnitude;
-		Vector3 lineDirection = (endPosition - startPosition).normalized;
+		Vector3 lineDirection = Vector3.right;
 		int totalPoints = 0;
 		foreach (int points in pointsPerFret)
 		{
@@ -36,7 +34,10 @@ public class String : MonoBehaviour {
 		}
 
 		startingPoints = new Vector3[totalPoints + 1];
-		float incrementalLength = totalLength / totalPoints;
+		float incrementalLength = length / totalPoints;
+		Vector3 startPosition = transform.position - (Vector3.right * length * 0.5f);
+		Vector3 endPosition = transform.position + (Vector3.right * length * 0.5f);
+		
 		for(int i = 0; i < totalPoints; i++){
 			startingPoints[i] = startPosition + (lineDirection * incrementalLength * i);
 		}
@@ -46,7 +47,11 @@ public class String : MonoBehaviour {
 		lineRenderer.positionCount = startingPoints.Length;
 		lineRenderer.SetPositions(startingPoints);
 	}
-	
+	private void ResizeBox(){
+		BoxCollider collider = GetComponent<BoxCollider>();
+		Vector3 newSize = new Vector3(length, 0.1f, maxAmplitude * 2); 
+		collider.size = newSize;
+	}
 	// Update is called once per frame
 	void Update () {
 		time += Time.deltaTime;
@@ -76,6 +81,6 @@ public class String : MonoBehaviour {
 	void OnDrawGizmosSelected()
     {
         Gizmos.color = new Color(0, 1, 0, 0.75F);
-        Gizmos.DrawLine(transform.position + startPosition, transform.position + endPosition);
+        Gizmos.DrawLine(transform.position - transform.right * length * 0.5f, transform.position + transform.right * length * 0.5f);
     }
 }
