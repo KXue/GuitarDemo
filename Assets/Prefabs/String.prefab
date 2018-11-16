@@ -54,7 +54,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   dampRate: 0.75
   waveVelocity: 450
-  startPosition: {x: -5, y: 0, z: 0}
+  maxAmplitude: 0.5
+  startPosition: {x: -5, y: 0, z: 1}
   endPosition: {x: 5, y: 0, z: 0}
   pointsPerFret: 030000000300000003000000
 --- !u!120 &120213906099824966

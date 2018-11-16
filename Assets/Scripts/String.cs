@@ -5,6 +5,7 @@ public class String : MonoBehaviour {
 	[Range(0, 1)]
 	public float dampRate;
 	public float waveVelocity;
+	public float maxAmplitude;
 	public Vector3 startPosition;
 	public Vector3 endPosition;
 	public int[] pointsPerFret;
@@ -12,7 +13,14 @@ public class String : MonoBehaviour {
 	LineRenderer lineRenderer;
 	Vector3[] startingPoints;
 	List<Vector3> touchPoints;
-
+	class LineSegment{
+		public int startIndex;
+		public int endIndex;
+	}
+	class Vibration{
+		public LineSegment segment;
+		public float amplitude;
+	}
 	void Start () {
 		lineRenderer = GetComponent<LineRenderer>();
 		InitializeLine();
@@ -47,19 +55,20 @@ public class String : MonoBehaviour {
 	}
 	void VibrateString(int startIndex, int endIndex, Vector3[] points){
 		Vector3 firstNode = points[startIndex];
-		Vector3 secondNode = points[endIndex]; 
+		Vector3 secondNode = points[endIndex];
 		
 		float totalLength = (secondNode - firstNode).magnitude;
 		int totalPoints = endIndex - startIndex;
 		float increment = totalLength / totalPoints;
 		float inverseTotal = 1f/totalPoints;
+		float frequency = waveVelocity/totalLength;
 		
 		Vector3 lineDirection = (secondNode - firstNode).normalized;
 		Vector3 upDirection = Quaternion.Euler(0, 90, 0) * lineDirection;
 
 		for(int i = 0; i <= totalPoints; i++)
 		{
-			float displacement = Mathf.Sin(i * inverseTotal * Mathf.PI) * Mathf.Sin(time);
+			float displacement = maxAmplitude * Mathf.Sin(i * inverseTotal * Mathf.PI) * Mathf.Sin(time * frequency * 4 * Mathf.PI);
 			points[startIndex + i] = firstNode + (lineDirection * increment * i) + (upDirection * displacement);
 		}
 
