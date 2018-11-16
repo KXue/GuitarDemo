@@ -13,14 +13,6 @@ public class String : MonoBehaviour {
 	LineRenderer lineRenderer;
 	Vector3[] startingPoints;
 	LineSegment[] frets;
-	struct LineSegment{
-		public int startIndex;
-		public int endIndex;
-	}
-	struct Vibration{
-		public LineSegment segment;
-		public float amplitude;
-	}
 	void Start () {
 		lineRenderer = GetComponent<LineRenderer>();
 		InitializeLine();
@@ -77,13 +69,86 @@ public class String : MonoBehaviour {
 	}
 	// Update is called once per frame
 	void Update () {
-		
-		time += Time.deltaTime;
-		VibrateString(0, startingPoints.Length - 1, startingPoints);
+		List<StringTouch> touchList = GetRelevantTouches();
+		GetStaionaryString(touchList);
+		// time += Time.deltaTime;
+		// VibrateString(0, startingPoints.Length - 1, startingPoints);
 		lineRenderer.SetPositions(startingPoints);
 	}
-	void UpdateStringIdlePosition(Vector3 [] currentStringPositions){
+	List<StringTouch> GetRelevantTouches(){
+		List<StringTouch> retList = new List<StringTouch>();
+		List<Touch> touches = InputHelper.Instance.GetTouches();
+		foreach (Touch touch in touches)
+		{
+			StringTouch relevantTouch = null;
 
+			Vector3 touchPosition = new Vector3(touch.position.x, touch.position.y, Camera.main.nearClipPlane);
+			RaycastHit hit;
+			bool touched = false;
+        	Ray ray = Camera.main.ScreenPointToRay(touchPosition);
+			if (Physics.Raycast(ray, out hit) && hit.transform == transform) {
+				relevantTouch = new StringTouch();
+				touched = true;
+				relevantTouch.hitInfo = hit;
+				relevantTouch.touch = touch;
+			}
+
+			if(touch.phase == TouchPhase.Moved){
+				Vector2 oldTouch = touch.position - touch.deltaPosition;
+				touchPosition = new Vector3(oldTouch.x, oldTouch.y, Camera.main.nearClipPlane);
+				ray = Camera.main.ScreenPointToRay(touchPosition);
+				if (Physics.Raycast(ray, out hit) && hit.transform == transform) {
+					if(!touched){
+						relevantTouch = new StringTouch();
+						relevantTouch.hitInfo = hit;
+						relevantTouch.touch = touch;
+						relevantTouch.type = TouchType.EXIT;
+						touched = true;
+					}
+					else{
+						relevantTouch.type = TouchType.MOVED;
+					}
+				}
+				else if(touched){
+					relevantTouch.type = TouchType.ENTER;
+				}
+			}
+
+			if(touched && relevantTouch.type == TouchType.NONE){
+				switch(touch.phase){
+					case TouchPhase.Began:
+						relevantTouch.type = TouchType.ENTER;
+					break;
+
+					case TouchPhase.Canceled:
+						relevantTouch.type = TouchType.EXIT;
+					break;
+					
+					case TouchPhase.Ended:
+						relevantTouch.type = TouchType.EXIT;
+					break;
+					
+					case TouchPhase.Stationary:
+						relevantTouch.type = TouchType.MOVED;
+					break;
+				}
+			}
+			if(touched){
+				retList.Add(relevantTouch);
+			}
+		}
+		return retList;
+	}
+	Vector3[] GetStaionaryString(List<StringTouch> touchList){
+		List<Vector3> newStringPoints = new List<Vector3>(startingPoints);
+		Vector3 startingPoint = newStringPoints[0];
+		foreach (StringTouch touch in touchList)
+		{
+			if(touch.type == TouchType.ENTER || touch.type == TouchType.MOVED){
+				newStringPoints.Add(touch.hitInfo.point - transform.position);
+			}
+		}
+		return newStringPoints.ToArray();
 	}
 	void VibrateString(int startIndex, int endIndex, Vector3[] points){
 		Vector3 firstNode = points[startIndex];
@@ -110,4 +175,19 @@ public class String : MonoBehaviour {
         Gizmos.color = new Color(0, 1, 0, 0.75F);
         Gizmos.DrawLine(transform.position - transform.right * length * 0.5f, transform.position + transform.right * length * 0.5f);
     }
+}
+public enum TouchType{ENTER, MOVED, EXIT, NONE}
+struct LineSegment{
+	public int startIndex;
+	public int endIndex;
+}
+struct Vibration{
+	public LineSegment segment;
+	public float amplitude;
+}
+
+class StringTouch{
+	public Touch touch;
+	public TouchType type = TouchType.NONE;
+	public RaycastHit hitInfo;
 }

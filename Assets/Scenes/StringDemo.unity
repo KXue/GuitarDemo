@@ -339,16 +339,6 @@ Prefab:
       propertyPath: m_RootOrder
       value: 2
       objectReference: {fileID: 0}
-    - target: {fileID: 114202529974033752, guid: cac14b7eb66624ef6bc9a51a5fc2030f,
-        type: 2}
-      propertyPath: pointsPerFret.Array.data[0]
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 114202529974033752, guid: cac14b7eb66624ef6bc9a51a5fc2030f,
-        type: 2}
-      propertyPath: pointsPerFret.Array.data[1]
-      value: 1
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: cac14b7eb66624ef6bc9a51a5fc2030f, type: 2}
   m_IsPrefabParent: 0

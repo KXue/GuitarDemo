@@ -66,7 +66,7 @@ public class InputHelper : MonoBehaviour
 	private void Update() {
 		if(Input.GetMouseButtonDown(1)){
 			TouchCreator newHold = new TouchCreator();
-			newHold.phase = TouchPhase.Began;
+			newHold.phase = TouchPhase.Moved;
             newHold.deltaPosition = new Vector2(0, 0);
             newHold.position = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
             newHold.fingerId = ++holdID;

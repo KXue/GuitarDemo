@@ -71,7 +71,7 @@ MonoBehaviour:
   length: 10
   fretPrefab: {fileID: 120494959521964742, guid: 5ea75fb772fce4faf9c4625e3992625b,
     type: 2}
-  pointsPerFret: 030000000300000004000000
+  pointsPerFret: 010000000100000004000000
 --- !u!120 &120213906099824966
 LineRenderer:
   m_ObjectHideFlags: 1
