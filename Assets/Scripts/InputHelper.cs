@@ -7,6 +7,7 @@ public class InputHelper : MonoBehaviour
 	public float touchRadius;
     private TouchCreator lastFakeTouch;
 	private List<Touch> holds;
+	private List<Touch> releases;
 	private int holdID = 0;
 	private static InputHelper instance;
 	public static InputHelper Instance{
@@ -23,6 +24,7 @@ public class InputHelper : MonoBehaviour
             instance = this;
         }
 		holds = new List<Touch>();
+		releases = new List<Touch>();
     }
 
     public List<Touch> GetTouches()
@@ -30,6 +32,8 @@ public class InputHelper : MonoBehaviour
         List<Touch> touches = new List<Touch>();
         touches.AddRange(Input.touches);
 		touches.AddRange(holds);
+		touches.AddRange(releases);
+		releases.Clear();
 #if UNITY_EDITOR
         if (lastFakeTouch == null) lastFakeTouch = new TouchCreator();
         if (Input.GetMouseButtonDown(0))
@@ -73,6 +77,15 @@ public class InputHelper : MonoBehaviour
 			holds.Add(newHold.Create());
 		}
 		if(Input.GetButton("Clear")){
+			foreach (Touch item in holds)
+			{
+				TouchCreator newRelease = new TouchCreator();
+				newRelease.phase = TouchPhase.Ended;
+				newRelease.deltaPosition = item.deltaPosition;
+				newRelease.position = item.position;
+				newRelease.fingerId = item.fingerId;
+				releases.Add(newRelease.Create());
+			}
 			holds.Clear();
 		}
 	}
