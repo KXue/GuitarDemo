@@ -65,13 +65,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8ad14ed0f9bb6204b914399c58d2057f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  dampRate: 0.75
+  dampRate: 0.9
   waveVelocity: 450
   maxAmplitude: 0.5
   length: 10
   fretPrefab: {fileID: 120494959521964742, guid: 5ea75fb772fce4faf9c4625e3992625b,
     type: 2}
-  pointsPerFret: 010000000100000004000000
+  pointsPerFret: 030000000300000004000000
 --- !u!120 &120213906099824966
 LineRenderer:
   m_ObjectHideFlags: 1
