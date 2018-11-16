@@ -178,23 +178,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
---- !u!1 &381943700 stripped
-GameObject:
-  m_PrefabParentObject: {fileID: 1970263172720756, guid: cac14b7eb66624ef6bc9a51a5fc2030f,
-    type: 2}
-  m_PrefabInternal: {fileID: 1584302916}
---- !u!65 &381943704
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 381943700}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 1
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 10, y: 0, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &1275803580
 GameObject:
   m_ObjectHideFlags: 0
@@ -358,17 +341,13 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 114202529974033752, guid: cac14b7eb66624ef6bc9a51a5fc2030f,
         type: 2}
-      propertyPath: startPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4737090841806982, guid: cac14b7eb66624ef6bc9a51a5fc2030f, type: 2}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
+      propertyPath: pointsPerFret.Array.data[0]
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 114202529974033752, guid: cac14b7eb66624ef6bc9a51a5fc2030f,
         type: 2}
-      propertyPath: length
-      value: 10
+      propertyPath: pointsPerFret.Array.data[1]
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: cac14b7eb66624ef6bc9a51a5fc2030f, type: 2}

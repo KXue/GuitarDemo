@@ -71,7 +71,9 @@ public class InputHelper : MonoBehaviour
             newHold.position = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
             newHold.fingerId = ++holdID;
 			holds.Add(newHold.Create());
-			Debug.Log(holds.Count);
+		}
+		if(Input.GetButton("Clear")){
+			holds.Clear();
 		}
 	}
 	private void OnDrawGizmos() {

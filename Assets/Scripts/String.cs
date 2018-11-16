@@ -7,16 +7,17 @@ public class String : MonoBehaviour {
 	public float waveVelocity;
 	public float maxAmplitude;
 	public float length;
+	public LineRenderer fretPrefab;
 	public int[] pointsPerFret;
 	float time = 0;
 	LineRenderer lineRenderer;
 	Vector3[] startingPoints;
-	List<Vector3> touchPoints;
-	class LineSegment{
+	LineSegment[] frets;
+	struct LineSegment{
 		public int startIndex;
 		public int endIndex;
 	}
-	class Vibration{
+	struct Vibration{
 		public LineSegment segment;
 		public float amplitude;
 	}
@@ -26,24 +27,46 @@ public class String : MonoBehaviour {
 		ResizeBox();
 	}
 	private void InitializeLine(){
-		Vector3 lineDirection = Vector3.right;
 		int totalPoints = 0;
+		totalPoints += 2; // end points
+		totalPoints += pointsPerFret.Length - 1; // fret points
+
 		foreach (int points in pointsPerFret)
 		{
 			totalPoints += points;
 		}
 
-		startingPoints = new Vector3[totalPoints + 1];
-		float incrementalLength = length / totalPoints;
+		startingPoints = new Vector3[totalPoints];
+		frets = new LineSegment[pointsPerFret.Length];
+		float incrementalLength = length / (totalPoints - 1);
 		Vector3 startPosition = transform.position - (Vector3.right * length * 0.5f);
 		Vector3 endPosition = transform.position + (Vector3.right * length * 0.5f);
 		
+		int fretStartIndex = 0;
+		int fretIndex = 0;
+		
 		for(int i = 0; i < totalPoints; i++){
-			startingPoints[i] = startPosition + (lineDirection * incrementalLength * i);
+			startingPoints[i] = startPosition + (Vector3.right * incrementalLength * i);
+			if(i - fretStartIndex == pointsPerFret[fretIndex] + 1){
+				LineSegment fret = new LineSegment();
+				fret.startIndex = fretStartIndex;
+				fret.endIndex = i;
+				fretStartIndex = i;
+				frets[fretIndex] = fret;
+				fretIndex++;
+			}
 		}
 
-		Debug.Log(totalPoints);
-		startingPoints[totalPoints] = endPosition;
+		LineRenderer newFret = Instantiate(fretPrefab, startingPoints[frets[0].startIndex], Quaternion.identity, transform);
+		newFret.SetPosition(0, Vector3.forward * maxAmplitude);
+		newFret.SetPosition(1, Vector3.forward * -maxAmplitude);
+		foreach (LineSegment fret in frets)
+		{
+			newFret = Instantiate(fretPrefab, startingPoints[fret.endIndex], Quaternion.identity, transform);
+			newFret.SetPosition(0, Vector3.forward * maxAmplitude);
+			newFret.SetPosition(1, Vector3.forward * -maxAmplitude);
+		}
+
 		lineRenderer.positionCount = startingPoints.Length;
 		lineRenderer.SetPositions(startingPoints);
 	}
@@ -54,9 +77,13 @@ public class String : MonoBehaviour {
 	}
 	// Update is called once per frame
 	void Update () {
+		
 		time += Time.deltaTime;
 		VibrateString(0, startingPoints.Length - 1, startingPoints);
 		lineRenderer.SetPositions(startingPoints);
+	}
+	void UpdateStringIdlePosition(Vector3 [] currentStringPositions){
+
 	}
 	void VibrateString(int startIndex, int endIndex, Vector3[] points){
 		Vector3 firstNode = points[startIndex];
