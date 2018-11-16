@@ -70,10 +70,12 @@ public class String : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 		List<StringTouch> touchList = GetRelevantTouches();
-		GetStaionaryString(touchList);
+		Vector3[] holds = GetHoldPoints(touchList);
 		// time += Time.deltaTime;
 		// VibrateString(0, startingPoints.Length - 1, startingPoints);
-		lineRenderer.SetPositions(startingPoints);
+		Vector3[] newString = GetStationaryString(holds);
+		lineRenderer.positionCount = newString.Length;
+		lineRenderer.SetPositions(newString);
 	}
 	List<StringTouch> GetRelevantTouches(){
 		List<StringTouch> retList = new List<StringTouch>();
@@ -139,16 +141,44 @@ public class String : MonoBehaviour {
 		}
 		return retList;
 	}
-	Vector3[] GetStaionaryString(List<StringTouch> touchList){
-		List<Vector3> newStringPoints = new List<Vector3>(startingPoints);
-		Vector3 startingPoint = newStringPoints[0];
+	Vector3[] GetHoldPoints(List<StringTouch> touchList){
+		List<Vector3> touchPoints = new List<Vector3>();
 		foreach (StringTouch touch in touchList)
 		{
 			if(touch.type == TouchType.ENTER || touch.type == TouchType.MOVED){
-				newStringPoints.Add(touch.hitInfo.point - transform.position);
+				Vector3 localPoint = transform.InverseTransformPoint(touch.hitInfo.point);
+				localPoint.y = 0;
+				touchPoints.Add(localPoint);
 			}
 		}
-		return newStringPoints.ToArray();
+		touchPoints.Sort((Vector3 a, Vector3 b)=>{return a.x.CompareTo(b.x);});
+		return touchPoints.ToArray();
+	}
+	Vector3[] GetStationaryString(Vector3[] holdPoints){
+		List<Vector3> newString = new List<Vector3>(startingPoints);
+		newString.AddRange(holdPoints);
+		newString.Sort((Vector3 a, Vector3 b)=>{return a.x.CompareTo(b.x);});
+		
+		int startingIndex = 0;
+		foreach (Vector3 point in holdPoints)
+		{
+			int pointIndex = newString.IndexOf(point);
+			StraightenSegment(newString, startingIndex, pointIndex);
+			startingIndex = pointIndex;
+		}
+		StraightenSegment(newString, startingIndex, newString.Count - 1);
+		
+		return newString.ToArray();
+	}
+	void StraightenSegment(List<Vector3> segment, int startIndex, int endIndex){
+		Vector3 startingPoint = segment[startIndex];
+		Vector3 endPoint = segment[endIndex];
+		float ratioZX = (endPoint.z - startingPoint.z) / (endPoint.x - startingPoint.x);
+		for(int i = startIndex + 1; i < endIndex; i++){
+			Vector3 newPosition = segment[i];
+			newPosition.z = (newPosition.x - startingPoint.x) * ratioZX + startingPoint.z;
+			segment[i] = newPosition;
+		}
 	}
 	void VibrateString(int startIndex, int endIndex, Vector3[] points){
 		Vector3 firstNode = points[startIndex];
